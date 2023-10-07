@@ -1,0 +1,7 @@
+tensorflow==2.13
+numpy
+pandas
+SimpleITK
+imgaug
+omegaconf
+pydicom

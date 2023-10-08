@@ -15,7 +15,7 @@ from src.utils import create_callbacks
 
 np.random.seed(2)
 
-def main(inputs, output):
+def main():
     # get config file
     config_file_path = Path('config.yaml')
     config = OmegaConf.load(config_file_path)

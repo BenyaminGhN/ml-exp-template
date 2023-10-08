@@ -49,8 +49,7 @@ class DataLoader():
 
         return train_seq, n_iter_train, val_seq, n_iter_val
     
-
-    def create_test_generator(self):
+    def create_eval_generator(self):
         if self.is_seg:
             csv_filename = self.config_.target_csv
         else:
@@ -58,7 +57,7 @@ class DataLoader():
         csv_file_path = os.path.join(self.data_dir, csv_filename)
 
         if Path(csv_file_path).exists():
-            test_df = self._get_test_df(str(csv_file_path))
+            eval_df = self._get_eval_df(str(csv_file_path))
         else:
             dicom_list = Path(self.data_dir).rglob("*.dcm")
             if self.is_seg:
@@ -75,16 +74,17 @@ class DataLoader():
                     labels["Path"].append(str(dcm.name))
                     labels["NumLabels"].append(0)
 
-            test_df = pd.DataFrame(labels)
+            eval_df = pd.DataFrame(labels)
 
         # Evaluation
-        test_seq = self._create_tf_seq(test_df, shuffle_on_epoch_end=False)
-        n_iter_test = len(test_df) // self.config.batch_size
+        eval_seq = self._create_tf_seq(eval_df, shuffle_on_epoch_end=False)
+        n_iter_eval = len(eval_df) // self.config.batch_size
 
-        return test_seq, n_iter_test
+        return eval_seq, n_iter_eval
     
-    def _get_test_df(self, path):
+    def _get_eval_df(self, path):
         df = pd.read_csv(path)
+        df = df[df['Split']=='evaluation']
         if not self.is_seg:
             df['NumLabels'] = df['Label'].apply(lambda x: 1 if x=='abnormal' else 0)
 
@@ -93,6 +93,8 @@ class DataLoader():
     def _get_train_val_df(self, path):
 
         df = pd.read_csv(path)
+
+        df = df[df['Split']=='train']
 
         if not self.is_seg:
             df['NumLabels'] = df['Label'].apply(lambda x: 1 if x=='abnormal' else 0)

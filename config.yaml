@@ -7,6 +7,9 @@ target_csv: 'labels_total.csv'
 model: src.model_building.ResNet50
 run_dir: './run/resnet50/'
 
+data_ingestion:
+  eval_split: 0.2
+  
 data_pipeline:
   # data pipline arguments for data prepartion 
   is_seg: false

@@ -46,7 +46,7 @@ def prepare_dir(data_root_dir='./data/'):
 
         # shutil.rmtree(sr_dir);
 
-def make_classification_df(data_root_dir='./data/'):
+def make_classification_df(config):
     """prepare a structured csv file out of your data folder
         for classification task based on the instructions:
 
@@ -56,12 +56,14 @@ def make_classification_df(data_root_dir='./data/'):
             - ID: the ids should be unique for each instance/row
             - Label: the label for the instance
             - Path: path of the data folder
+            - Split: to determine weather the instance is for train or evaluation
 
     Descriptions:
     - these configs are adjusted for the iaaa dental detection competetion.
     - the image dataset are considered as dicom images (.dcm) which we name the ID column
         as SOPInstanceUID
     """
+    data_root_dir=config.data_root_dir
     data_dirs = [fn for fn in os.listdir(data_root_dir) 
                  if ('iaaa_data_v' in fn) and (os.path.isdir(os.path.join(data_root_dir, fn)))]
 
@@ -75,9 +77,15 @@ def make_classification_df(data_root_dir='./data/'):
     columns = ['SOPInstanceUID', 'Label', 'Path']
     df_total = pd.concat(dfs_list, ignore_index =True).loc[:, columns]
 
+    splits = np.array(['train']*len(df_total), dtype='object')
+    eval_split = config.data_ingestion.eval_split
+    eval_indices = np.random.RandomState(config.seed).randint(0, len(splits), int(len(splits) * eval_split))
+    splits[eval_indices] = 'evaluation'
+    df_total['Split'] = splits
+
     df_total.to_csv(os.path.join(data_root_dir, 'labels_total.csv'), index=False)
 
-def make_segmentation_df(data_root_dir='./data/'):
+def make_segmentation_df(config):
     """prepare a structured csv file out of your data folder
         for segmentation task based on the instructions:
 
@@ -88,11 +96,13 @@ def make_segmentation_df(data_root_dir='./data/'):
             - Label: the label for the instance
             - Path: path of the data folder
             - MaskPath: path of the mask files
+            - Split: to determine weather the instance is for train or evaluation
     Descriptions:
     - these configs are adjusted for the iaaa dental detection competetion.
     - the image dataset are considered as dicom images (.dcm) which we name the ID column
         as SOPInstanceUID
     """
+    data_root_dir=config.data_root_dir
     data_dirs = [fn for fn in os.listdir(data_root_dir) 
                  if ('iaaa_data' in fn) and (os.path.isdir(os.path.join(data_root_dir, fn)))]
     
@@ -108,11 +118,17 @@ def make_segmentation_df(data_root_dir='./data/'):
     columns = ['SOPInstanceUID', 'Label', 'Path', 'MaskPath', 'MaskPath_nii']
     df_total = pd.concat(dfs_list, ignore_index =True).loc[:, columns]
 
+    splits = np.array(['train']*len(df_total), dtype='object')
+    eval_split = config.data_ingestion.eval_split
+    eval_indices = np.random.RandomState(config.seed).randint(0, len(splits), int(len(splits) * eval_split))
+    splits[eval_indices] = 'evaluation'
+    df_total['Split'] = splits
+
     df_total.to_csv(os.path.join(data_root_dir, 'labels_seg_total.csv'), index=False)
 
 
 def get_class_dist(data_root_dir):
-    """get the labels distributions
+    """plot the labels distributions
     """
     df_path = os.path.join(data_root_dir, 'labels.csv')
     df = pd.read_csv(df_path)
@@ -135,8 +151,8 @@ def main():
     data_root_dir = config.data_root_dir
 
     prepare_dir(data_root_dir)
-    make_classification_df(data_root_dir)
-    make_segmentation_df(data_root_dir)
+    make_classification_df(config)
+    make_segmentation_df(config)
 
 if __name__ == '__main__':
     main()

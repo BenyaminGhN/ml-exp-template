@@ -1,0 +1,51 @@
+seed: 2
+
+data_root_dir: './data/'  
+run_dit: './run/'
+target_csv: 'labels_total.csv'
+
+model: src.model_building.ResNet50
+run_dir: './run/resnet50/'
+
+data_pipeline:
+  # data pipline arguments for data prepartion 
+  is_seg: false
+  to_augment: true
+  class_names: ['normal', 'abnormal'] # label names training
+  is_binary: true
+  val_split: 0.2 # validation split ratio
+  shuffle: true # shuffle the whole datasets before training
+  batch_size: 16 # batch size ( train, validation, evlauation )
+  train_for_submittion: true
+
+preprocessing:
+  # prerpocessing components and considerations
+  add_channel: true
+  target_size: [256, 512] # target image size (h, w)
+  crop_ratio: [0.2, 0.3]
+
+augmentation:
+  # augmentation components and considerations
+  oversampling: true
+  flip: true
+  rotation: true
+  zooming: true
+
+training:
+  # training components and considerations
+  export_metric: 'val_loss' # best model checkpoint basis 
+  export_mode: 'min' # best model checkpoint basis mode 
+  epochs: 2 # num of epochs
+  reset: true
+
+model_builder:
+  # model builder components and considerations
+  input_shape: [256, 512, 3] # (h, w, ch)
+  activation: 'sigmoid'
+  weights: null # 'imagenet' or null
+  threshold: 0.5 # decision boundary
+  n_classes: 2
+
+evaluation:
+  # evaluation components and considerations
+  metrics: [] # manual metrics

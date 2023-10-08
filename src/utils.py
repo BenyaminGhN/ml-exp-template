@@ -1,6 +1,9 @@
 import tensorflow as tf
 import warnings
 import yaml
+import shutil
+import os
+from pathlib import Path
 tfk = tf.keras
 K = tfk.backend
 
@@ -8,18 +11,49 @@ from tensorflow.python.keras.callbacks import Callback, ModelCheckpoint, ReduceL
 import numpy as np
 from tensorflow.keras.metrics import MeanIoU
 
-def create_callbacks(checkpoint_path, history_output_path, log_dir):
+def create_callbacks(config):
+
+    sm_dir = config.run_dir
+    if config.training.reset:
+        if os.path.exists(sm_dir):
+            shutil.rmtree(sm_dir)
+    log_dir = sm_dir+'logs/'
+    checkpoints_dir = sm_dir+'checkpoints/'
+    if not os.path.exists(checkpoints_dir):
+        os.makedirs(checkpoints_dir)
+    history_output_path = sm_dir+'history.csv'
+
+    to_track = config.training.export_metric
+    checkpoint_path = str(checkpoints_dir) + "/sm-{epoch:04d}"
+    checkpoint_path = checkpoint_path + "-{" + to_track + ":4.5f}.hdf5"
     check1 = ModelCheckpoint(checkpoint_path,
-                             monitor = 'val_loss',
+                            #  monitor = config.training.export_metric,
                              verbose = 1, 
-                             save_best_only = True, 
                              save_weights_only = True, 
-                             mode = 'min')
+                            #  mode = config.training.export_mode
+                             )
 
     lr_reduction = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=2, verbose=1, mode="min", min_lr=1e-8)
     history_logger = CSVLogger(history_output_path, separator=",", append=True)
     tensor_board = TensorBoard(log_dir=log_dir, histogram_freq=0, write_graph=False, write_images=False)
     return [check1, lr_reduction, history_logger, tensor_board]
+
+def get_checkpoints_info(checkpoints_dir: Path):
+    """Returns info about checkpoints.
+
+    Returns:
+        A list of dictionaries related to each checkpoint:
+            {'epoch': int, 'path': pathlib.Path, 'value': float}
+    """
+
+    checkpoints = checkpoints_dir.glob('*.hdf5')
+    ckpt_info = list()
+    for cp in checkpoints:
+        splits = str(cp.name).split('.hdf5')[0].split('-')
+        epoch = int(splits[1])
+        metric_value = float(splits[2])
+        ckpt_info.append({'path': cp, 'epoch': epoch, 'value': metric_value})
+    return ckpt_info
 
 def f1(y_true, y_pred):
     def recall(y_true, y_pred):

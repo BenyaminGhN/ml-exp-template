@@ -301,7 +301,8 @@ class AugmentedImageSequence(Sequence):
         return self.x_path[: self.steps * self.batch_size]
 
     def prepare_dataset(self):
-        df = self.dataset_df.sample(frac=1.0, random_state=self.random_state)
+        # df = self.dataset_df.sample(frac=1.0, random_state=self.random_state)
+        df = self.dataset_df
         self.x_path, self.y = (df[self.x_col].values, 
                                 df[self.y_col].values.astype('float32'))
         
@@ -441,7 +442,8 @@ class AugmentedImageSequenceSeg(Sequence):
         return self.x_path[: self.steps * self.batch_size]
 
     def prepare_dataset(self):
-        df = self.dataset_df.sample(frac=1.0, random_state=self.random_state)
+        # df = self.dataset_df.sample(frac=1.0, random_state=self.random_state)
+        df = self.dataset_df
         self.x_path, self.y_path = (df[self.x_col].values, 
                                 df[self.y_col].values)
 

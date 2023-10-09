@@ -54,3 +54,12 @@ evaluation:
   # evaluation components and considerations
   metrics: [] # manual metrics
   to_save: true
+
+interpertation:
+  core_model: null # if the cnn model embed in a general model 
+  prediction_layer: null # last prediction layer name
+  target_layer: null # target conv layer name to explain
+  target_class_idx: 1 # target class to explain
+  max_limit: 16 # frame limit to save images
+  to_save: true
+  method_name: grad_cam

@@ -55,7 +55,7 @@ evaluation:
   metrics: [] # manual metrics
   to_save: true
 
-interpertation:
+interpretation:
   core_model: null # if the cnn model embed in a general model 
   prediction_layer: null # last prediction layer name
   target_layer: null # target conv layer name to explain

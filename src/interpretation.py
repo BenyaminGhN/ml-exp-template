@@ -11,13 +11,13 @@ class Explainer():
         self.config = config
         self.model = model
 
-        self.target_layer=self.config.interpertation.target_layer
-        self.core_model=self.config.interpertation.core_model
-        self.prediction_layer=self.config.interpertation.prediction_layer
-        self.max_limit = self.config.interpertation.max_limit
-        self.target_class_idx = self.config.interpertation.target_class_idx
-        self.to_save = self.config.interpertation.to_save
-        self.method_name = self.config.interpertation.method_name
+        self.target_layer=self.config.interpretation.target_layer
+        self.core_model=self.config.interpretation.core_model
+        self.prediction_layer=self.config.interpretation.prediction_layer
+        self.max_limit = self.config.interpretation.max_limit
+        self.target_class_idx = self.config.interpretation.target_class_idx
+        self.to_save = self.config.interpretation.to_save
+        self.method_name = self.config.interpretation.method_name
 
         # get the core model if there is one 
         if self.core_model:

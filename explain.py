@@ -6,7 +6,7 @@ tfk = tf.keras
 K = tfk.backend
 
 from src.data_preparation import DataLoader
-from src.interpertation import Explainer
+from src.interpretation import Explainer
 from src.utils import get_checkpoints_info
 
 def main():

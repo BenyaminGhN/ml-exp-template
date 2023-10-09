@@ -142,17 +142,3 @@ def get_class_dist(data_root_dir):
     bars = ax.bar(class_names, class_dist)
 
     plt.show()
-
-def main():
-    # get config file
-    config_file_path = Path('./config.yaml')
-    config = OmegaConf.load(config_file_path)
-
-    data_root_dir = config.data_root_dir
-
-    prepare_dir(data_root_dir)
-    make_classification_df(config)
-    make_segmentation_df(config)
-
-if __name__ == '__main__':
-    main()
